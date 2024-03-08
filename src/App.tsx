@@ -1,37 +1,28 @@
+import L from "leaflet";
+import React, { useCallback, useEffect, useState } from "react";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import arrowIcon from "./assets/images/icon-arrow.svg";
-import React, { useEffect, useState, useCallback } from "react";
-
-export interface QueryResponse {
-  status: string;
-  country: string;
-  countryCode: string;
-  region: string;
-  regionName: string;
-  city: string;
-  zip: string;
-  lat: number;
-  lon: number;
-  timezone: string;
-  isp: string;
-  org: string;
-  as: string;
-  query: string;
-}
+import markerIcon from "./assets/images/icon-location.svg";
+import InfoContainer from "./components/InfoContainer";
+import Spinner from "./components/Spinner";
+import { QueryResponse } from "./types";
 
 function App() {
   const [data, setData] = useState<QueryResponse | undefined>(undefined);
   const [input, setInput] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const address = `${data?.city}, ${data?.countryCode}, ${data?.zip}`;
 
   const fetchData = useCallback(
     function () {
+      setLoading(true);
       fetch(`http://ip-api.com/json/${input}`)
         .then((res) => res.json())
         .then((data) => setData(data))
-        .catch((err) => console.error(err));
+        .catch((err) => console.error(err))
+        .finally(() => setLoading(false));
     },
     [input]
   );
@@ -55,7 +46,7 @@ function App() {
     }
   }
 
-  function getTimezoneOffset(tz: string) {
+  function getTimezoneOffset(tz: string | undefined = "Asia/Kolkata") {
     const options: Intl.DateTimeFormatOptions = {
       timeZone: tz,
       timeZoneName: "longOffset",
@@ -79,10 +70,6 @@ function App() {
     );
   }
 
-  if (!data) {
-    return <p>loading...</p>;
-  }
-
   return (
     <main>
       <div className="info-container">
@@ -96,57 +83,54 @@ function App() {
               placeholder="Search for any IP address or domain"
             />
             <button className="btn" type="submit">
-              <img src={arrowIcon} alt="" />
+              {loading ? <Spinner /> : <img src={arrowIcon} alt="" />}
             </button>
           </form>
           <p className={`error-message ${error ? "error" : ""}`}>{error}</p>
         </div>
-        <div className="ip-info-div">
-          <div className="ip-info-container">
-            <div className="info-wrapper">
-              <span>IP Address</span>
-              <p>{data.query}</p>
-            </div>
-          </div>
-          <div className="ip-info-container">
-            <div className="info-wrapper">
-              <span>Location</span>
-              <p>{address}</p>
-            </div>
-          </div>
-          <div className="ip-info-container">
-            <div className="info-wrapper">
-              <span>Timezone</span>
-              <p>{getTimezoneOffset(data.timezone)}</p>
-            </div>
-          </div>
-          <div className="ip-info-container">
-            <div className="info-wrapper">
-              <span>ISP</span>
-              <p>{data.isp}</p>
-            </div>
-          </div>
+        <div className={`ip-info-div ${error ? "error" : ""}`}>
+          <>
+            <InfoContainer
+              label="IP Address"
+              value={data?.query}
+              loading={loading}
+            />
+            <InfoContainer label="Location" value={address} loading={loading} />
+            <InfoContainer
+              label="Timezone"
+              value={getTimezoneOffset(data?.timezone)}
+              loading={loading}
+            />
+            <InfoContainer label="ISP" value={data?.isp} loading={loading} />
+          </>
         </div>
       </div>
-      <MapContainer
-        key={data.lat}
-        id="map"
-        center={[data.lat, data.lon]}
-        zoom={13}
-        scrollWheelZoom={false}
-        zoomControl={false}
-        dragging={false}
-      >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        <Marker position={[data.lat, data.lon]}>
-          <Popup>
-            {data.isp}, <br /> {address}, <br /> {data.query}
-          </Popup>
-        </Marker>
-      </MapContainer>
+      {data && (
+        <MapContainer
+          key={data.lat}
+          id="map"
+          center={[data.lat, data.lon]}
+          zoom={13}
+          scrollWheelZoom={false}
+          zoomControl={false}
+          dragging={false}
+        >
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+          <Marker
+            position={[data.lat, data.lon]}
+            icon={L.icon({
+              iconUrl: markerIcon,
+            })}
+          >
+            <Popup>
+              {data.isp}, <br /> {address}, <br /> {data.query}
+            </Popup>
+          </Marker>
+        </MapContainer>
+      )}
     </main>
   );
 }

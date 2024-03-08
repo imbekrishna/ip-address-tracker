@@ -122,6 +122,28 @@ main {
   flex-direction: column;
 }
 
+.loader {
+  margin: auto;
+  width: 25px;
+  max-width: 60px;
+  aspect-ratio: 1;
+  border: 2px solid currentColor;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 #map {
   flex: 1;
 }
@@ -184,7 +206,7 @@ main {
 }
 
 .error-message {
-  margin: 0.2em;
+  margin-block: 0.7em;
   max-width: fit-content;
   margin-inline: auto;
   color: rgb(240, 192, 192);
@@ -205,6 +227,10 @@ main {
   border-radius: 0.8em;
   background-color: white;
   z-index: 1000;
+}
+
+.ip-info-div.error {
+  top: calc(55% + 1em);
 }
 
 .ip-info-container {
@@ -252,6 +278,10 @@ main {
     justify-content: space-evenly;
 
     top: 70%;
+  }
+
+  .ip-info-div.error {
+    top: calc(70% + 1em);
   }
 
   .ip-info-div > * + * {
