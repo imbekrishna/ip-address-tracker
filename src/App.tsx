@@ -9,22 +9,29 @@ import { QueryResponse } from "./types";
 
 function App() {
   const [data, setData] = useState<QueryResponse | undefined>(undefined);
-  const [input, setInput] = useState<string>("");
+  const [search, setSearch] = useState<string>("");
+  const [searchType, setSearchType] = useState<"ipAddress" | "domain">(
+    "ipAddress"
+  );
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const address = `${data?.city}, ${data?.countryCode}, ${data?.zip}`;
+  const address = `${data?.location.city}, ${data?.location.country}, ${data?.location.postalCode}`;
 
   const fetchData = useCallback(
     function () {
       setLoading(true);
-      fetch(`https://ip-api.com/json/${input}`)
+      fetch(
+        `https://geo.ipify.org/api/v2/country,city?apiKey=${
+          import.meta.env.VITE_IPIFY_KEY
+        }&${searchType}=${search}`
+      )
         .then((res) => res.json())
         .then((data) => setData(data))
         .catch((err) => console.error(err))
         .finally(() => setLoading(false));
     },
-    [input]
+    [search, searchType]
   );
 
   useEffect(() => {
@@ -40,22 +47,10 @@ function App() {
     const validIp = checkIpAddress(query);
 
     if (query === "" || validIp) {
-      setInput(query);
+      setSearch(query);
     } else {
       setError("Wrong address format! Try again.");
     }
-  }
-
-  function getTimezoneOffset(tz: string | undefined = "Asia/Kolkata") {
-    const options: Intl.DateTimeFormatOptions = {
-      timeZone: tz,
-      timeZoneName: "longOffset",
-    };
-    const dateText = Intl.DateTimeFormat([], options).format(new Date());
-    console.log(dateText);
-
-    const timeZoneString = dateText.split(" ")[1].replace(/GMT/, "UTC ");
-    return timeZoneString;
   }
 
   function checkIpAddress(address: string) {
@@ -63,11 +58,19 @@ function App() {
     const ipv6Pattern = /^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$/;
     const domainPattern =
       /(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]/;
-    return (
-      ipv4Pattern.test(address) ||
-      ipv6Pattern.test(address) ||
-      domainPattern.test(address)
-    );
+
+    const isIP = ipv4Pattern.test(address) || ipv6Pattern.test(address);
+    const isDomain = domainPattern.test(address);
+    const isValid = isIP || isDomain;
+
+    if (isValid && isIP) {
+      setSearchType("ipAddress");
+    }
+    if (isValid && isDomain) {
+      setSearchType("domain");
+    }
+
+    return isValid;
   }
 
   return (
@@ -92,13 +95,13 @@ function App() {
           <>
             <InfoContainer
               label="IP Address"
-              value={data?.query}
+              value={data?.ip}
               loading={loading}
             />
             <InfoContainer label="Location" value={address} loading={loading} />
             <InfoContainer
               label="Timezone"
-              value={getTimezoneOffset(data?.timezone)}
+              value={`UTC ${data?.location.timezone}`}
               loading={loading}
             />
             <InfoContainer label="ISP" value={data?.isp} loading={loading} />
@@ -107,9 +110,9 @@ function App() {
       </div>
       {data && (
         <MapContainer
-          key={data.lat ?? 1}
+          key={data.location.lat}
           id="map"
-          center={[data.lat ?? 25.23, data.lon ?? 50.34]}
+          center={[data.location.lat, data.location.lng]}
           zoom={13}
           scrollWheelZoom={false}
           zoomControl={false}
@@ -120,13 +123,13 @@ function App() {
             url="https://www.google.com/maps/vt?lyrs=m@189&gl=cn&x={x}&y={y}&z={z}"
           />
           <Marker
-            position={[data.lat ?? 25.23, data.lon ?? 50.34]}
+            position={[data.location.lat, data.location.lng]}
             icon={L.icon({
               iconUrl: markerIcon,
             })}
           >
             <Popup>
-              {data.isp}, <br /> {address}, <br /> {data.query}
+              {data.as.name}, <br /> {address}, <br /> {data.ip}
             </Popup>
           </Marker>
         </MapContainer>

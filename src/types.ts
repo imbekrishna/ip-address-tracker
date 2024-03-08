@@ -1,16 +1,26 @@
 export interface QueryResponse {
-  status: string;
-  country: string;
-  countryCode: string;
-  region: string;
-  regionName: string;
-  city: string;
-  zip: string;
-  lat: number;
-  lon: number;
-  timezone: string;
+  ip: string;
+  location: Location;
+  domains: string[];
+  as: As;
   isp: string;
-  org: string;
-  as: string;
-  query: string;
+}
+
+export interface Location {
+  country: string;
+  region: string;
+  city: string;
+  lat: number;
+  lng: number;
+  postalCode: string;
+  timezone: string;
+  geonameId: number;
+}
+
+export interface As {
+  asn: number;
+  name: string;
+  route: string;
+  domain: string;
+  type: string;
 }

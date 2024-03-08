@@ -25,3 +25,5 @@ dist-ssr
 
 style-guide.md
 README-*
+
+.env
