@@ -107,9 +107,9 @@ function App() {
       </div>
       {data && (
         <MapContainer
-          key={data.lat}
+          key={data.lat ?? 1}
           id="map"
-          center={[data.lat, data.lon]}
+          center={[data.lat ?? 25.23, data.lon ?? 50.34]}
           zoom={13}
           scrollWheelZoom={false}
           zoomControl={false}
@@ -120,7 +120,7 @@ function App() {
             url="https://www.google.com/maps/vt?lyrs=m@189&gl=cn&x={x}&y={y}&z={z}"
           />
           <Marker
-            position={[data.lat, data.lon]}
+            position={[data.lat ?? 25.23, data.lon ?? 50.34]}
             icon={L.icon({
               iconUrl: markerIcon,
             })}
