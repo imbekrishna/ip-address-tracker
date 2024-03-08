@@ -18,7 +18,7 @@ function App() {
   const fetchData = useCallback(
     function () {
       setLoading(true);
-      fetch(`http://ip-api.com/json/${input}`)
+      fetch(`https://ip-api.com/json/${input}`)
         .then((res) => res.json())
         .then((data) => setData(data))
         .catch((err) => console.error(err))
