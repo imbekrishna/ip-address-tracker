@@ -19,20 +19,28 @@ function App() {
         </div>
         <div className="ip-info-div">
           <div className="ip-info-container">
-            <span>IP Address</span>
-            <p>192.212.174.101</p>
+            <div className="info-wrapper">
+              <span>IP Address</span>
+              <p>192.212.174.101</p>
+            </div>
           </div>
           <div className="ip-info-container">
-            <span>Location</span>
-            <p>Brooklyn, NY 10001</p>
+            <div className="info-wrapper">
+              <span>Location</span>
+              <p>Brooklyn, NY 10001</p>
+            </div>
           </div>
           <div className="ip-info-container">
-            <span>Timezone</span>
-            <p>UTC -05:00</p>
+            <div className="info-wrapper">
+              <span>Timezone</span>
+              <p>UTC -05:00</p>
+            </div>
           </div>
           <div className="ip-info-container">
-            <span>ISP</span>
-            <p>SpaceX Starlink</p>
+            <div className="info-wrapper">
+              <span>ISP</span>
+              <p>SpaceX Starlink</p>
+            </div>
           </div>
         </div>
       </div>
@@ -41,6 +49,8 @@ function App() {
         center={[51.505, -0.09]}
         zoom={13}
         scrollWheelZoom={false}
+        zoomControl={false}
+        dragging={false}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
