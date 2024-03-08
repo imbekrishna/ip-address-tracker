@@ -145,30 +145,52 @@ main {
   font-size: 1.5rem;
   font-weight: var(--fw-semi);
 }
-
-.ip-input-div {
+.form-wrapper {
   width: 100%;
   max-width: 600px;
+  text-align: center;
+}
+.ip-input-div {
   display: flex;
-  justify-content: center;
-  background-color: yellowgreen;
-
-  border-radius: 0.8em;
   overflow: hidden;
+  justify-content: center;
+  border-radius: 0.8em;
 }
 
 .ip-input-div > input {
   font-family: inherit;
+  font-size: var(--fs-body);
   border: none;
   padding: 1em;
   flex: 1;
 }
+
+.ip-input-div > input:hover {
+  cursor: pointer;
+}
+
 .btn {
   background-color: black;
   border: none;
   width: 60px;
   display: grid;
   place-items: center;
+  transition: all 10ms;
+}
+
+.btn:hover {
+  cursor: pointer;
+  background-color: hsl(0, 0%, 25%);
+}
+
+.error-message {
+  margin: 0.2em;
+  max-width: fit-content;
+  margin-inline: auto;
+  color: rgb(240, 192, 192);
+  padding-inline: 1em;
+  background-color: #f16d6d88;
+  border-radius: 5px;
 }
 
 .ip-info-div {
@@ -215,8 +237,11 @@ main {
   }
 
   .info-container {
-    background-size: initial;
     min-height: 280px;
+  }
+
+  .title {
+    font-size: 2rem;
   }
 
   /* TODO: Fix height */
@@ -226,7 +251,7 @@ main {
     flex-direction: row;
     justify-content: space-evenly;
 
-    top: 65%;
+    top: 70%;
   }
 
   .ip-info-div > * + * {
@@ -241,9 +266,5 @@ main {
   .info-container span {
     align-self: flex-start;
     font-size: large;
-  }
-
-  .info-container p {
-    font-size: 1.9rem;
   }
 }
